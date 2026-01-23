@@ -53,6 +53,8 @@
     <UseDebugLibraries>true</UseDebugLibraries>
     <PlatformToolset>v145</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
+    <VCToolsVersion>
+    </VCToolsVersion>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
@@ -76,9 +78,11 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <IncludePath>$(SolutionDir)networkEDS\include;$(SolutionDir)networkEDS\include\portaudio;$(SolutionDir)networkEDS\include\opus;$(SolutionDir)networkEDS\include\srtp;C:\local\boost_1_89_0;$(IncludePath)</IncludePath>
-    <LibraryPath>$(SolutionDir)networkEDS\include\portaudio;$(SolutionDir)networkEDS\include\opus;$(SolutionDir)networkEDS\include\srtp;C:\local\boost_1_89_0\libs;$(BoostLibDir);$(LibraryPath)</LibraryPath>
+    <IncludePath>$(SolutionDir)EDS_server\include;$(SolutionDir)EDS_server\include\portaudio;$(SolutionDir)EDS_server\include\opus;$(SolutionDir)EDS_server\include\srtp;$(IncludePath)</IncludePath>
+    <LibraryPath>$(SolutionDir)EDS_server\include\portaudio;$(SolutionDir)EDS_server\include\opus;$(SolutionDir)EDS_server\include\srtp;C:\local\boost_1_89_0\libs;$(BoostLibDir);$(LibraryPath)</LibraryPath>
     <ExternalIncludePath>$(ExternalIncludePath)</ExternalIncludePath>
+    <OutDir>$(ProjectDir)$(Configuration)\</OutDir>
+    <IntDir>$(ProjectDir)$(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <IncludePath>$(SolutionDir)networkEDS\include;$(SolutionDir)networkEDS\include\portaudio;$(SolutionDir)networkEDS\include\opus;$(SolutionDir)networkEDS\include\srtp;$(BoostIncludeDir);$(IncludePath)</IncludePath>
@@ -122,9 +126,9 @@
       <WarningLevel>Level3</WarningLevel>
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <ConformanceMode>true</ConformanceMode>
+      <ConformanceMode>false</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
-      <LanguageStandard_C>stdc17</LanguageStandard_C>
+      <LanguageStandard_C>Default</LanguageStandard_C>
       <AdditionalIncludeDirectories>$(ProjectDir)include;$(BoostIncludeDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
