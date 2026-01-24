@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
@@ -92,7 +92,6 @@
     <ClInclude Include="..\..\imgui.h" />
     <ClInclude Include="..\..\imgui_freetype.h" />
     <ClInclude Include="..\..\imgui_internal.h" />
-    <ClInclude Include="net_log.h" />
     <ClInclude Include="winfirst.h" />
   </ItemGroup>
   <ItemGroup>
@@ -115,8 +114,6 @@
     <UseDebugLibraries>true</UseDebugLibraries>
     <CharacterSet>Unicode</CharacterSet>
     <PlatformToolset>v145</PlatformToolset>
-    <VCToolsVersion>
-    </VCToolsVersion>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
@@ -155,8 +152,8 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <OutDir>$(ProjectDir)$(Configuration)\</OutDir>
     <IntDir>$(ProjectDir)$(Configuration)\</IntDir>
-    <IncludePath>$(SolutionDir)thirdparty\dxsdk\Include;$(SolutionDir)thirdparty\freetype\include;$(IncludePath)</IncludePath>
-    <LibraryPath>$(SolutionDir)thirdparty\freetype\win64;$(SolutionDir)thirdparty\dxsdk\Lib\x64;$(LibraryPath)</LibraryPath>
+    <IncludePath>C:\Qt\qtprojects\eduspace\EDS_server\include\nlohmann;C:\Users\Пользователь\Desktop\portaudio-19.7.0\include;C:\Users\Пользователь\Desktop\opus-main\include;C:\Users\Пользователь\Desktop\libsrtp-2.7.0\include;C:\local\boost_1_89_0;C:\Qt\qtprojects\eduspace\thirdparty\freetype\include;C:\Users\Пользователь\Desktop\MENTALITY V2\SDK\Include;$(IncludePath)</IncludePath>
+    <LibraryPath>C:\local\boost_1_89_0\libs;C:\Qt\qtprojects\eduspace\EDS_server\include\opus;C:\Qt\qtprojects\eduspace\EDS_server\include\portaudio;C:\Qt\qtprojects\eduspace\EDS_server\include\srtp;C:\Qt\qtprojects\eduspace\thirdparty\freetype\win64;C:\Users\Пользователь\Desktop\MENTALITY V2\SDK\Lib\x64;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <OutDir>$(ProjectDir)$(Configuration)\</OutDir>
@@ -187,15 +184,15 @@
       <WarningLevel>Level4</WarningLevel>
       <Optimization>Disabled</Optimization>
       <AdditionalIncludeDirectories>..\..;..\..\backends;%(AdditionalIncludeDirectories);</AdditionalIncludeDirectories>
-      <AdditionalOptions>/utf-8 /bigobj %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions>/utf-8 %(AdditionalOptions)</AdditionalOptions>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <LanguageStandard>stdcpp20</LanguageStandard>
       <ForcedIncludeFiles>$(ProjectDir)winfirst.h;%(ForcedIncludeFiles)</ForcedIncludeFiles>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>d3d11.lib;d3dcompiler.lib;dxgi.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>$(ProjectDir)thirdparty\Lib\x64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>d3d11.lib;d3dcompiler.lib;dxgi.lib;portaudio_static_x64.lib;opus.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(DXSDK_DIR)/Lib/x64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <SubSystem>Windows</SubSystem>
     </Link>
   </ItemDefinitionGroup>

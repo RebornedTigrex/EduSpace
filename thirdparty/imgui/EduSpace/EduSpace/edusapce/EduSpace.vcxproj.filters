@@ -240,7 +240,6 @@
       <Filter>framework\media</Filter>
     </ClInclude>
     <ClInclude Include="winfirst.h" />
-    <ClInclude Include="net_log.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
