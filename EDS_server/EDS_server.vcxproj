@@ -89,6 +89,9 @@
     <LibraryPath>$(SolutionDir)networkEDS\include\portaudio;$(SolutionDir)networkEDS\include\opus;$(SolutionDir)networkEDS\include\srtp;$(BoostLibDir);$(LibraryPath)</LibraryPath>
     <ExternalIncludePath>$(ExternalIncludePath)</ExternalIncludePath>
   </PropertyGroup>
+  <PropertyGroup Label="Vcpkg">
+    <VcpkgEnabled>false</VcpkgEnabled>
+  </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
@@ -135,7 +138,7 @@
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalDependencies>portaudio_static_x64.lib;opus.lib;srtp3.lib;libssl.lib;libcrypto.lib;ws2_32.lib;secur32.lib;crypt32.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>$(BoostLibDir);$(SolutionDir)networkEDS\include\portaudio;$(SolutionDir)networkEDS\include\opus;$(SolutionDir)networkEDS\include\srtp;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(BoostLibDir);$(SolutionDir)EDS_server\include\portaudio;$(SolutionDir)EDS_server\include\opus;$(SolutionDir)EDS_server\include\srtp;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
