@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
@@ -19,11 +19,6 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\..\..\..\..\..\Users\Пользователь\Desktop\Новая папка (2)\cAudioIO.cpp" />
-    <ClCompile Include="..\..\..\..\..\..\..\Users\Пользователь\Desktop\Новая папка (2)\cConferenceNet.cpp" />
-    <ClCompile Include="..\..\..\..\..\..\..\Users\Пользователь\Desktop\Новая папка (2)\cOpusCodec.cpp" />
-    <ClCompile Include="..\..\..\..\..\..\..\Users\Пользователь\Desktop\Новая папка (2)\cRtcClientPeer.cpp" />
-    <ClCompile Include="..\..\..\..\..\..\..\Users\Пользователь\Desktop\Новая папка (2)\cWsClient.cpp" />
     <ClCompile Include="..\..\..\..\framework\gui.cpp" />
     <ClCompile Include="..\..\..\..\framework\helpers\blur.cpp" />
     <ClCompile Include="..\..\..\..\framework\helpers\config.cpp" />
@@ -59,11 +54,6 @@
     <Library Include="..\..\..\freetype\win64\freetype.lib" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\..\..\..\..\..\Users\Пользователь\Desktop\Новая папка (2)\cAudioIO.h" />
-    <ClInclude Include="..\..\..\..\..\..\..\Users\Пользователь\Desktop\Новая папка (2)\cConferenceNet.h" />
-    <ClInclude Include="..\..\..\..\..\..\..\Users\Пользователь\Desktop\Новая папка (2)\cOpusCodec.h" />
-    <ClInclude Include="..\..\..\..\..\..\..\Users\Пользователь\Desktop\Новая папка (2)\cRtcClientPeer.h" />
-    <ClInclude Include="..\..\..\..\..\..\..\Users\Пользователь\Desktop\Новая папка (2)\cWsClient.h" />
     <ClInclude Include="..\..\..\..\framework\data\fonts.h" />
     <ClInclude Include="..\..\..\..\framework\data\images.h" />
     <ClInclude Include="..\..\..\..\framework\headers\app_state.h" />
@@ -187,7 +177,7 @@
       <WarningLevel>Level4</WarningLevel>
       <Optimization>Disabled</Optimization>
       <AdditionalIncludeDirectories>..\..;..\..\backends;%(AdditionalIncludeDirectories);</AdditionalIncludeDirectories>
-      <AdditionalOptions>/utf-8 /bigobj %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions>/utf-8 %(AdditionalOptions)</AdditionalOptions>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <LanguageStandard>stdcpp20</LanguageStandard>
       <ForcedIncludeFiles>$(ProjectDir)winfirst.h;%(ForcedIncludeFiles)</ForcedIncludeFiles>
