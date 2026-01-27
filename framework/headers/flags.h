@@ -1,5 +1,7 @@
 #pragma once
 
+#include <imgui.h>
+
 typedef int style_var;
 typedef int style_col;
 typedef int window_flags;
