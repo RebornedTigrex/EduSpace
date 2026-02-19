@@ -194,9 +194,4 @@
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
   </ItemGroup>
-  <ItemGroup>
-    <None Include="packages.config">
-      <Filter>EDS_server</Filter>
-    </None>
-  </ItemGroup>
 </Project>

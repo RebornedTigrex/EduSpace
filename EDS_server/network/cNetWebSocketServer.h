@@ -1,6 +1,7 @@
 ﻿#pragma once
 
 #include <boost/asio.hpp>
+#include <boost/asio/strand.hpp>
 #include <boost/beast.hpp>
 
 #include "modules/BaseModule.h"
@@ -41,7 +42,7 @@ namespace Sys::Network {
             using tcp = boost::asio::ip::tcp;
             using ws_stream = boost::beast::websocket::stream<tcp::socket>;
 
-            sWsSession(tcp::socket&& sock, cNetWebSocketServer* owner);
+            sWsSession(tcp::socket&& sock, cNetWebSocketServer* owner, boost::asio::io_context& io);
 
             void fnStart();
             void fnDoRead();
@@ -50,11 +51,16 @@ namespace Sys::Network {
             void fnDoWrite();
             void fnClose();
 
-            ws_stream                 m_ws;
+            ws_stream m_ws;
+
+           
+            boost::asio::strand<boost::asio::io_context::executor_type> m_strand;
+
             boost::beast::flat_buffer m_buffer;
             cNetWebSocketServer* m_owner{ nullptr };
 
-            std::deque<std::string> m_outQ;
+            std::deque<std::shared_ptr<std::string>> m_outQ;
+
             bool m_open{ false };
             bool m_writing{ false };
         };
@@ -65,7 +71,7 @@ namespace Sys::Network {
 
     private:
         boost::asio::io_context& m_ctx;
-        unsigned short           m_port{ 0 };
+        unsigned short m_port{ 0 };
 
         std::unique_ptr<boost::asio::ip::tcp::acceptor> m_acceptor;
         bool m_running{ false };

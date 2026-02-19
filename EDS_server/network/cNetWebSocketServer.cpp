@@ -7,32 +7,37 @@ namespace beast = boost::beast;
 namespace websocket = beast::websocket;
 using tcp = boost::asio::ip::tcp;
 
-
-cNetWebSocketServer::sWsSession::sWsSession(tcp::socket&& sock, cNetWebSocketServer* owner)
+cNetWebSocketServer::sWsSession::sWsSession(tcp::socket&& sock, cNetWebSocketServer* owner, boost::asio::io_context& io)
     : m_ws(std::move(sock))
+    , m_strand(io.get_executor())   
     , m_owner(owner)
 {
-
 }
 
 void cNetWebSocketServer::sWsSession::fnStart()
 {
     auto self = shared_from_this();
-
-    m_ws.async_accept([self](beast::error_code ec)
+    boost::asio::dispatch(m_strand, [self]()
         {
-            if (ec) {
-                std::cerr << "[WS] accept failed: " << ec.message() << "\n";
-                return;
-            }
+            self->m_ws.async_accept(
+                boost::asio::bind_executor(self->m_strand,
+                    [self](beast::error_code ec)
+                    {
+                        if (ec) {
+                            std::cerr << "[WS] accept failed: " << ec.message() << "\n";
+                            return;
+                        }
 
-            self->m_open = true;
+                        self->m_open = true;
 
-            if (self->m_owner) self->m_owner->fnRegisterSession(self.get(), self);
-            if (self->m_owner && self->m_owner->m_fnOnConnected)
-                self->m_owner->m_fnOnConnected(self.get());
+                        if (self->m_owner) self->m_owner->fnRegisterSession(self.get(), self);
+                        if (self->m_owner && self->m_owner->m_fnOnConnected)
+                            self->m_owner->m_fnOnConnected(self.get());
 
-            self->fnDoRead();
+                        self->fnDoRead();
+                    }
+                )
+            );
         });
 }
 
@@ -40,33 +45,37 @@ void cNetWebSocketServer::sWsSession::fnDoRead()
 {
     auto self = shared_from_this();
 
-    m_ws.async_read(m_buffer, [self](beast::error_code ec, std::size_t bytes)
-        {
-            if (ec) {
-                self->fnClose();
-                return;
+    m_ws.async_read(m_buffer,
+        boost::asio::bind_executor(m_strand,
+            [self](beast::error_code ec, std::size_t bytes)
+            {
+                if (ec) {
+                    self->fnClose();
+                    return;
+                }
+
+                std::string msg = beast::buffers_to_string(self->m_buffer.data());
+                self->m_buffer.consume(bytes);
+
+                if (self->m_owner && self->m_owner->m_fnOnMessage)
+                    self->m_owner->m_fnOnMessage(msg, self.get());
+
+                self->fnDoRead();
             }
-
-            std::string msg = beast::buffers_to_string(self->m_buffer.data());
-            self->m_buffer.consume(bytes);
-
-            if (self->m_owner && self->m_owner->m_fnOnMessage)
-                self->m_owner->m_fnOnMessage(msg, self.get());
-
-            self->fnDoRead();
-        });
+        )
+    );
 }
 
 void cNetWebSocketServer::sWsSession::fnSendTextQueued(std::string txt)
 {
-    if (!m_open) return;
-
     auto self = shared_from_this();
-    boost::asio::post(m_ws.get_executor(), [self, txt = std::move(txt)]() mutable
+    auto msg = std::make_shared<std::string>(std::move(txt));
+
+    boost::asio::post(m_strand, [self, msg]()
         {
             if (!self->m_open) return;
 
-            self->m_outQ.push_back(std::move(txt));
+            self->m_outQ.push_back(msg);
             if (!self->m_writing) {
                 self->m_writing = true;
                 self->fnDoWrite();
@@ -83,34 +92,46 @@ void cNetWebSocketServer::sWsSession::fnDoWrite()
         return;
     }
 
-    const std::string& front = m_outQ.front();
+    auto msg = m_outQ.front();
     m_ws.text(true);
 
-    m_ws.async_write(boost::asio::buffer(front),
-        [self](beast::error_code ec, std::size_t)
-        {
-            if (ec) {
-                self->fnClose();
-                return;
-            }
+    m_ws.async_write(boost::asio::buffer(*msg),
+        boost::asio::bind_executor(m_strand,
+            [self, msg](beast::error_code ec, std::size_t)
+            {
+                if (ec) {
+                    self->fnClose();
+                    return;
+                }
 
-            self->m_outQ.pop_front();
-            self->fnDoWrite();
-        });
+                self->m_outQ.pop_front();
+                self->fnDoWrite();
+            }
+        )
+    );
 }
 
 void cNetWebSocketServer::sWsSession::fnClose()
 {
-    if (!m_open) return;
-    m_open = false;
+    auto self = shared_from_this();
 
-    if (m_owner) m_owner->fnUnregisterSession(this);
-    if (m_owner && m_owner->m_fnOnDisconnected)
-        m_owner->m_fnOnDisconnected(this);
+    boost::asio::dispatch(m_strand, [self]()
+        {
+            if (!self->m_open) return;
+            self->m_open = false;
 
-    beast::error_code ec;
-    m_ws.close(websocket::close_code::normal, ec);
+            if (self->m_owner) self->m_owner->fnUnregisterSession(self.get());
+            if (self->m_owner && self->m_owner->m_fnOnDisconnected)
+                self->m_owner->m_fnOnDisconnected(self.get());
+
+            self->m_outQ.clear();
+            self->m_writing = false;
+
+            beast::error_code ec;
+            self->m_ws.close(websocket::close_code::normal, ec);
+        });
 }
+
 
 cNetWebSocketServer::cNetWebSocketServer(boost::asio::io_context& ctx, unsigned short port)
     : BaseModule("NetWebSocketServer")
@@ -118,7 +139,6 @@ cNetWebSocketServer::cNetWebSocketServer(boost::asio::io_context& ctx, unsigned 
     , m_port(port)
 {
 }
-
 
 cNetWebSocketServer::~cNetWebSocketServer()
 {
@@ -170,17 +190,19 @@ void cNetWebSocketServer::fnDoAccept()
 {
     if (!m_running || !m_acceptor) return;
 
-    m_acceptor->async_accept([this](beast::error_code ec, tcp::socket sock)
+    m_acceptor->async_accept(
+        [this](beast::error_code ec, tcp::socket sock)
         {
             if (!ec) {
-                auto session = std::make_shared<sWsSession>(std::move(sock), this);
+                auto session = std::make_shared<sWsSession>(std::move(sock), this, m_ctx);
                 session->fnStart();
             }
             else {
                 std::cerr << "[WS] accept error: " << ec.message() << "\n";
             }
             fnDoAccept();
-        });
+        }
+    );
 }
 
 void cNetWebSocketServer::fnRegisterSession(void* key, std::shared_ptr<sWsSession> s)

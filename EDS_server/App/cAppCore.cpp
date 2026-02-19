@@ -1,4 +1,4 @@
-﻿#include "App/cAppCore.h"
+#include "App/cAppCore.h"
 #include <thread>
 #include <chrono>
 

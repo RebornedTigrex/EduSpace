@@ -85,6 +85,12 @@
     <LibraryPath>$(SolutionDir)thirdparty\portaudio;$(SolutionDir)thirdparty\opus;$(SolutionDir)thirdparty\srtp;$(BoostLibDir);$(LibraryPath)</LibraryPath>
     <ExternalIncludePath>$(ExternalIncludePath)</ExternalIncludePath>
   </PropertyGroup>
+  <PropertyGroup Label="Vcpkg">
+    <VcpkgEnableManifest>false</VcpkgEnableManifest>
+  </PropertyGroup>
+  <PropertyGroup Label="Vcpkg" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <VcpkgUseStatic>false</VcpkgUseStatic>
+  </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
@@ -185,9 +191,6 @@
     <ClInclude Include="utils\utils.h" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="packages.config" />
-  </ItemGroup>
-  <ItemGroup>
     <ClCompile Include="App\cAppCore.cpp" />
     <ClCompile Include="BaseAction.cpp" />
     <ClCompile Include="BaseActionManager.cpp" />
@@ -200,7 +203,9 @@
     <ClCompile Include="Core\modules\cRtcModule.cpp" />
     <ClCompile Include="Core\modules\cRtcRelayModule.cpp" />
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="network\cNetHttpServer.cpp" />
+    <ClCompile Include="network\cNetHttpServer.cpp">
+      <DeploymentContent>false</DeploymentContent>
+    </ClCompile>
     <ClCompile Include="network\cNetIoContext.cpp" />
     <ClCompile Include="network\cNetWebSocketServer.cpp" />
     <ClCompile Include="rtc\cRtcManager.cpp" />
@@ -208,13 +213,5 @@
     <ClCompile Include="utils\cLogger.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
-  <ImportGroup Label="ExtensionTargets">
-    <Import Project="..\packages\libdatachannel.0.22.6\build\native\libdatachannel.targets" Condition="Exists('..\packages\libdatachannel.0.22.6\build\native\libdatachannel.targets')" />
-  </ImportGroup>
-  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
-    <PropertyGroup>
-      <ErrorText>Данный проект ссылается на пакеты NuGet, отсутствующие на этом компьютере. Используйте восстановление пакетов NuGet, чтобы скачать их.  Дополнительную информацию см. по адресу: http://go.microsoft.com/fwlink/?LinkID=322105. Отсутствует следующий файл: {0}.</ErrorText>
-    </PropertyGroup>
-    <Error Condition="!Exists('..\packages\libdatachannel.0.22.6\build\native\libdatachannel.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\libdatachannel.0.22.6\build\native\libdatachannel.targets'))" />
-  </Target>
+  <ImportGroup Label="ExtensionTargets" />
 </Project>
