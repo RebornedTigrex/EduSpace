@@ -14,14 +14,14 @@
 
 namespace Sys::Network {
 
-    class cNetWebSocketServer : public BaseModule {
+    class cNetWebSocketServer final : public BaseModule {
     public:
         using tOnMessage = std::function<void(const std::string&, void*)>;
         using tOnConnected = std::function<void(void*)>;
         using tOnDisconnected = std::function<void(void*)>;
 
         cNetWebSocketServer(boost::asio::io_context& ctx, unsigned short port);
-        ~cNetWebSocketServer();
+        ~cNetWebSocketServer() override;
 
         void fnSetOnMessage(tOnMessage fn) { m_fnOnMessage = std::move(fn); }
         void fnSetOnConnected(tOnConnected fn) { m_fnOnConnected = std::move(fn); }
@@ -30,8 +30,11 @@ namespace Sys::Network {
         bool fnStart();
         void fnStop();
 
-        // send text to конкретной сессии (void* из callbacks)
         bool fnSendText(void* pSession, const std::string& txt);
+
+    protected:
+        bool onInitialize() override { return fnStart(); }
+        void onShutdown() override { fnStop(); }
 
     private:
         struct sWsSession : public std::enable_shared_from_this<sWsSession> {
@@ -45,14 +48,12 @@ namespace Sys::Network {
 
             void fnSendTextQueued(std::string txt);
             void fnDoWrite();
-
             void fnClose();
 
             ws_stream                 m_ws;
             boost::beast::flat_buffer m_buffer;
             cNetWebSocketServer* m_owner{ nullptr };
 
-            // очередь отправки (чтобы не было одновременных async_write)
             std::deque<std::string> m_outQ;
             bool m_open{ false };
             bool m_writing{ false };
@@ -64,7 +65,7 @@ namespace Sys::Network {
 
     private:
         boost::asio::io_context& m_ctx;
-        unsigned short m_port{ 0 };
+        unsigned short           m_port{ 0 };
 
         std::unique_ptr<boost::asio::ip::tcp::acceptor> m_acceptor;
         bool m_running{ false };

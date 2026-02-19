@@ -158,8 +158,31 @@
     <ClInclude Include="Core\interfaces\iModule.h" />
     <ClInclude Include="Core\interfaces\iAction.h" />
     <ClInclude Include="Core\interfaces\iActionManager.h" />
+    <ClInclude Include="Core\managers\conference\cConferenceAction.h" />
+    <ClInclude Include="Core\managers\conference\cConferenceManager.h" />
     <ClInclude Include="Core\managers\ModuleRegistry.h" />
     <ClInclude Include="Core\modules\BaseModule.h" />
+    <ClInclude Include="Core\modules\cActionManagerModule.h" />
+    <ClInclude Include="Core\modules\cActionRouterModule.h" />
+    <ClInclude Include="Core\modules\cConferenceModule.h" />
+    <ClInclude Include="Core\modules\cRtcModule.h" />
+    <ClInclude Include="Core\modules\cRtcRelayModule.h" />
+    <ClInclude Include="events\NetEvents.h" />
+    <ClInclude Include="events\PeerEvents.h" />
+    <ClInclude Include="events\RtcEvents.h" />
+    <ClInclude Include="json\cJsonSerializer.h" />
+    <ClInclude Include="network\cNetHttpServer.h" />
+    <ClInclude Include="network\cNetIoContext.h" />
+    <ClInclude Include="network\cNetWebSocketServer.h" />
+    <ClInclude Include="rtc\cRtcManager.h" />
+    <ClInclude Include="rtc\cRtcPeer.h" />
+    <ClInclude Include="rtc\cWebRtcAction.h" />
+    <ClInclude Include="services\cConferenceService.h" />
+    <ClInclude Include="Core\modules\cNetModule.h" />
+    <ClInclude Include="services\cPeerDirectoryService.h" />
+    <ClInclude Include="utils\cLogger.h" />
+    <ClInclude Include="utils\fnWordGenerator.h" />
+    <ClInclude Include="utils\utils.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
@@ -168,9 +191,21 @@
     <ClCompile Include="App\cAppCore.cpp" />
     <ClCompile Include="BaseAction.cpp" />
     <ClCompile Include="BaseActionManager.cpp" />
-    <ClCompile Include="BaseModule.cpp" />
     <ClCompile Include="Core\EventBus.h" />
-    <ClCompile Include="eduspace_server.cpp" />
+    <ClCompile Include="Core\managers\conference\cConferenceManager.cpp" />
+    <ClCompile Include="Core\modules\cActionManagerModule.cpp" />
+    <ClCompile Include="Core\modules\cActionRouterModule.cpp" />
+    <ClCompile Include="Core\modules\cConferenceModule.cpp" />
+    <ClCompile Include="Core\modules\cNetModule.cpp" />
+    <ClCompile Include="Core\modules\cRtcModule.cpp" />
+    <ClCompile Include="Core\modules\cRtcRelayModule.cpp" />
+    <ClCompile Include="main.cpp" />
+    <ClCompile Include="network\cNetHttpServer.cpp" />
+    <ClCompile Include="network\cNetIoContext.cpp" />
+    <ClCompile Include="network\cNetWebSocketServer.cpp" />
+    <ClCompile Include="rtc\cRtcManager.cpp" />
+    <ClCompile Include="rtc\cRtcPeer.cpp" />
+    <ClCompile Include="utils\cLogger.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

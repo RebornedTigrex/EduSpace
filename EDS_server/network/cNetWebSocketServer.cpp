@@ -121,10 +121,12 @@ void cNetWebSocketServer::sWsSession::fnClose()
 // ---------------- server ----------------
 
 cNetWebSocketServer::cNetWebSocketServer(boost::asio::io_context& ctx, unsigned short port)
-    : m_ctx(ctx)
+    : BaseModule("NetWebSocketServer")
+    , m_ctx(ctx)
     , m_port(port)
 {
 }
+
 
 cNetWebSocketServer::~cNetWebSocketServer()
 {
