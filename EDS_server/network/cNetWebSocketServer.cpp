@@ -7,21 +7,18 @@ namespace beast = boost::beast;
 namespace websocket = beast::websocket;
 using tcp = boost::asio::ip::tcp;
 
-// ---------------- session ----------------
 
 cNetWebSocketServer::sWsSession::sWsSession(tcp::socket&& sock, cNetWebSocketServer* owner)
     : m_ws(std::move(sock))
     , m_owner(owner)
 {
-    // можно настроить max message size и т.п.
-    // m_ws.read_message_max(16 * 1024 * 1024);
+
 }
 
 void cNetWebSocketServer::sWsSession::fnStart()
 {
     auto self = shared_from_this();
 
-    // Важно: accept должен выполняться в io_context потоке.
     m_ws.async_accept([self](beast::error_code ec)
         {
             if (ec) {
@@ -65,8 +62,6 @@ void cNetWebSocketServer::sWsSession::fnSendTextQueued(std::string txt)
     if (!m_open) return;
 
     auto self = shared_from_this();
-
-    // post в executor websocket stream, чтобы и очередь и writes жили в одном потоке.
     boost::asio::post(m_ws.get_executor(), [self, txt = std::move(txt)]() mutable
         {
             if (!self->m_open) return;
@@ -114,11 +109,8 @@ void cNetWebSocketServer::sWsSession::fnClose()
         m_owner->m_fnOnDisconnected(this);
 
     beast::error_code ec;
-    // нормальное закрытие
     m_ws.close(websocket::close_code::normal, ec);
 }
-
-// ---------------- server ----------------
 
 cNetWebSocketServer::cNetWebSocketServer(boost::asio::io_context& ctx, unsigned short port)
     : BaseModule("NetWebSocketServer")
@@ -187,8 +179,6 @@ void cNetWebSocketServer::fnDoAccept()
             else {
                 std::cerr << "[WS] accept error: " << ec.message() << "\n";
             }
-
-            // продолжаем принимать
             fnDoAccept();
         });
 }

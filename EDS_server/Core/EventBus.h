@@ -12,7 +12,7 @@ public:
     boost::signals2::connection subscribe(
         typename boost::signals2::signal<void(const Event&)>::slot_type slot)
     {
-        auto sig = fnGetSignal<Event>();     // НЕ reference
+        auto sig = fnGetSignal<Event>();     //Не реф
         return sig->connect(std::move(slot));
     }
 
