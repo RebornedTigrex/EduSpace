@@ -1,5 +1,5 @@
 ﻿#include "cRtcPeer.h"
-#include "../util/cLogger.h"
+#include "../utils/cLogger.h"
 #include <cstring>
 
 using namespace Sys::Rtc;
@@ -20,7 +20,6 @@ cRtcPeer::cRtcPeer() {
         });
 
     m_pc->onLocalDescription([this](rtc::Description const& desc) {
-        // Это главный путь: сюда прилетает ANSWER после setLocalDescription()
         if (m_onLocalDesc) m_onLocalDesc(desc);
         });
 
@@ -28,13 +27,9 @@ cRtcPeer::cRtcPeer() {
         if (m_onLocalCand) m_onLocalCand(cand);
         });
 
-    // Если клиент создаёт DC первым — принимаем
     m_pc->onDataChannel([this](std::shared_ptr<rtc::DataChannel> dc) {
         fnBindDataChannel(std::move(dc));
         });
-
-    // Сервер может создать DC тоже, но делаем это не всегда сразу,
-    // чтобы не получить дубликаты — "ensure once"
     fnEnsureDataChannel();
 }
 
@@ -60,7 +55,6 @@ void cRtcPeer::fnBindDataChannel(std::shared_ptr<rtc::DataChannel> dc) {
     std::lock_guard<std::mutex> lg(m_mtx);
     if (m_closed) return;
 
-    // если уже есть открытый/назначенный — оставим первый
     if (m_dc) return;
     m_dc = std::move(dc);
 
@@ -73,19 +67,15 @@ void cRtcPeer::fnBindDataChannel(std::shared_ptr<rtc::DataChannel> dc) {
             if (!out.empty()) std::memcpy(out.data(), b.data(), b.size());
             m_onBinary(out);
         }
-        // текст на сервере не нужен — игнор
         });
 }
 
 void cRtcPeer::fnApplyRemoteOffer(const std::string& sdpOffer) {
     std::lock_guard<std::mutex> lg(m_mtx);
     if (m_closed || !m_pc) return;
-
-    // Remote offer
     rtc::Description remoteDesc(sdpOffer, "offer");
     m_pc->setRemoteDescription(remoteDesc);
 
-    // Async: libdatachannel сгенерит answer и дернет onLocalDescription
     m_pc->setLocalDescription();
 }
 

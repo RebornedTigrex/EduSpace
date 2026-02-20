@@ -53,7 +53,7 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="eduspace_server.cpp">
+    <ClCompile Include="main.cpp">
       <Filter>EDS_server</Filter>
     </ClCompile>
     <ClCompile Include="Core\EventBus.h">
@@ -62,41 +62,50 @@
     <ClCompile Include="App\cAppCore.cpp">
       <Filter>EDS_server\App</Filter>
     </ClCompile>
-    <ClCompile Include="BaseModule.cpp">
-      <Filter>EDS_server\Core\modules</Filter>
-    </ClCompile>
     <ClCompile Include="BaseAction.cpp">
       <Filter>EDS_server\Core\modules</Filter>
     </ClCompile>
     <ClCompile Include="BaseActionManager.cpp">
       <Filter>EDS_server\Core\modules</Filter>
     </ClCompile>
-    <ClCompile Include="network\cNetHttpServer.cpp">
-      <Filter>EDS_server\Network</Filter>
-    </ClCompile>
-    <ClCompile Include="network\cNetIoContext.cpp">
-      <Filter>EDS_server\Network</Filter>
-    </ClCompile>
-    <ClCompile Include="network\cNetWebSocketServer.cpp">
-      <Filter>EDS_server\Network</Filter>
+    <ClCompile Include="utils\cLogger.cpp">
+      <Filter>Исходные файлы</Filter>
     </ClCompile>
     <ClCompile Include="rtc\cRtcManager.cpp">
-      <Filter>EDS_server\rtc</Filter>
+      <Filter>Исходные файлы</Filter>
     </ClCompile>
     <ClCompile Include="rtc\cRtcPeer.cpp">
-      <Filter>EDS_server\rtc</Filter>
+      <Filter>Исходные файлы</Filter>
     </ClCompile>
-    <ClCompile Include="media\cMediaAudioDevice.cpp">
-      <Filter>EDS_server\media</Filter>
+    <ClCompile Include="network\cNetHttpServer.cpp">
+      <Filter>Исходные файлы</Filter>
     </ClCompile>
-    <ClCompile Include="media\cMediaOpusEncDec.cpp">
-      <Filter>EDS_server\media</Filter>
+    <ClCompile Include="network\cNetIoContext.cpp">
+      <Filter>Исходные файлы</Filter>
     </ClCompile>
-    <ClCompile Include="media\cMediaPipeline.cpp">
-      <Filter>EDS_server\media</Filter>
+    <ClCompile Include="network\cNetWebSocketServer.cpp">
+      <Filter>Исходные файлы</Filter>
     </ClCompile>
-    <ClCompile Include="EventBus.cpp">
-      <Filter>EDS_server\Core</Filter>
+    <ClCompile Include="Core\managers\conference\cConferenceManager.cpp">
+      <Filter>Исходные файлы</Filter>
+    </ClCompile>
+    <ClCompile Include="Core\modules\cNetModule.cpp">
+      <Filter>Исходные файлы</Filter>
+    </ClCompile>
+    <ClCompile Include="Core\modules\cRtcModule.cpp">
+      <Filter>Исходные файлы</Filter>
+    </ClCompile>
+    <ClCompile Include="Core\modules\cConferenceModule.cpp">
+      <Filter>Исходные файлы</Filter>
+    </ClCompile>
+    <ClCompile Include="Core\modules\cRtcRelayModule.cpp">
+      <Filter>Исходные файлы</Filter>
+    </ClCompile>
+    <ClCompile Include="Core\modules\cActionManagerModule.cpp">
+      <Filter>Исходные файлы</Filter>
+    </ClCompile>
+    <ClCompile Include="Core\modules\cActionRouterModule.cpp">
+      <Filter>Исходные файлы</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -124,29 +133,74 @@
     <ClInclude Include="BaseActionManager.h">
       <Filter>EDS_server\Core\modules</Filter>
     </ClInclude>
-    <ClInclude Include="network\cNetHttpServer.h">
-      <Filter>EDS_server\Network</Filter>
+    <ClInclude Include="utils\cLogger.h">
+      <Filter>Файлы заголовков</Filter>
     </ClInclude>
-    <ClInclude Include="network\cNetIoContext.h">
-      <Filter>EDS_server\Network</Filter>
+    <ClInclude Include="utils\fnWordGenerator.h">
+      <Filter>Файлы заголовков</Filter>
     </ClInclude>
-    <ClInclude Include="network\cNetWebSocketServer.h">
-      <Filter>EDS_server\Network</Filter>
-    </ClInclude>
-    <ClInclude Include="rtc\cRtcManager.h">
-      <Filter>EDS_server\rtc</Filter>
+    <ClInclude Include="utils\utils.h">
+      <Filter>Файлы заголовков</Filter>
     </ClInclude>
     <ClInclude Include="rtc\cRtcPeer.h">
-      <Filter>EDS_server\rtc</Filter>
+      <Filter>Файлы заголовков</Filter>
     </ClInclude>
-    <ClInclude Include="media\cMediaAudioDevice.h">
-      <Filter>EDS_server\media</Filter>
+    <ClInclude Include="rtc\cRtcManager.h">
+      <Filter>Файлы заголовков</Filter>
     </ClInclude>
-    <ClInclude Include="media\cMediaOpusEncDec.h">
-      <Filter>EDS_server\media</Filter>
+    <ClInclude Include="network\cNetHttpServer.h">
+      <Filter>Файлы заголовков</Filter>
     </ClInclude>
-    <ClInclude Include="media\cMediaPipeline.h">
-      <Filter>EDS_server\media</Filter>
+    <ClInclude Include="network\cNetIoContext.h">
+      <Filter>Файлы заголовков</Filter>
+    </ClInclude>
+    <ClInclude Include="network\cNetWebSocketServer.h">
+      <Filter>Файлы заголовков</Filter>
+    </ClInclude>
+    <ClInclude Include="json\cJsonSerializer.h">
+      <Filter>Файлы заголовков</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\managers\conference\cConferenceManager.h">
+      <Filter>Файлы заголовков</Filter>
+    </ClInclude>
+    <ClInclude Include="events\NetEvents.h">
+      <Filter>Файлы заголовков</Filter>
+    </ClInclude>
+    <ClInclude Include="events\PeerEvents.h">
+      <Filter>Файлы заголовков</Filter>
+    </ClInclude>
+    <ClInclude Include="events\RtcEvents.h">
+      <Filter>Файлы заголовков</Filter>
+    </ClInclude>
+    <ClInclude Include="services\cPeerDirectoryService.h">
+      <Filter>Файлы заголовков</Filter>
+    </ClInclude>
+    <ClInclude Include="services\cConferenceService.h">
+      <Filter>Файлы заголовков</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\modules\cNetModule.h">
+      <Filter>Файлы заголовков</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\modules\cRtcModule.h">
+      <Filter>Файлы заголовков</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\modules\cConferenceModule.h">
+      <Filter>Файлы заголовков</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\modules\cRtcRelayModule.h">
+      <Filter>Файлы заголовков</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\modules\cActionManagerModule.h">
+      <Filter>Файлы заголовков</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\modules\cActionRouterModule.h">
+      <Filter>Файлы заголовков</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\managers\conference\cConferenceAction.h">
+      <Filter>Файлы заголовков</Filter>
+    </ClInclude>
+    <ClInclude Include="rtc\cWebRtcAction.h">
+      <Filter>Файлы заголовков</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -1,7 +1,7 @@
 ﻿#include "cNetHttpServer.h"
 #include <boost/beast/http.hpp>
 #include <iostream>
-
+#include <utility> 
 namespace http = boost::beast::http;
 using tcp = boost::asio::ip::tcp;
 
@@ -9,34 +9,44 @@ namespace Sys {
     namespace Network {
 
         cNetHttpServer::cNetHttpServer(boost::asio::io_context& ioCtx, unsigned short port)
-            : m_rIoCtx(ioCtx), m_uPort(port), m_bRunning(false)
+            : BaseModule("NetHttpServer")
+            , m_rIoCtx(ioCtx)
+            , m_uPort(port)
+            , m_bRunning(false)
         {
         }
 
-        cNetHttpServer::~cNetHttpServer() { fnStop(); }
+
+        cNetHttpServer::~cNetHttpServer()
+        {
+            fnStop();
+        }
+
 
         bool cNetHttpServer::fnStart()
         {
             if (m_bRunning) return true;
 
-            try {
-                tcp::endpoint ep(tcp::v4(), m_uPort);
+            boost::system::error_code ec;
+            tcp::endpoint ep(tcp::v4(), m_uPort);
+
+            if (!m_pAcceptor)
                 m_pAcceptor = std::make_unique<tcp::acceptor>(m_rIoCtx);
-                boost::system::error_code ec;
 
-                m_pAcceptor->open(ep.protocol(), ec);
-                m_pAcceptor->set_option(boost::asio::socket_base::reuse_address(true), ec);
-                m_pAcceptor->bind(ep, ec);
-                m_pAcceptor->listen(boost::asio::socket_base::max_listen_connections, ec);
+            m_pAcceptor->open(ep.protocol(), ec);
+            if (ec) { std::cerr << "[HTTP] open error: " << ec.message() << "\n"; return false; }
 
-                m_bRunning = true;
-                fnDoAccept();
-            }
-            catch (const std::exception& e) {
-                std::cerr << "[HTTP] start error: " << e.what() << std::endl;
-                return false;
-            }
+            m_pAcceptor->set_option(boost::asio::socket_base::reuse_address(true), ec);
+            if (ec) { std::cerr << "[HTTP] reuse_address error: " << ec.message() << "\n"; return false; }
 
+            m_pAcceptor->bind(ep, ec);
+            if (ec) { std::cerr << "[HTTP] bind error: " << ec.message() << "\n"; return false; }
+
+            m_pAcceptor->listen(boost::asio::socket_base::max_listen_connections, ec);
+            if (ec) { std::cerr << "[HTTP] listen error: " << ec.message() << "\n"; return false; }
+
+            m_bRunning = true;
+            fnDoAccept();
             return true;
         }
 

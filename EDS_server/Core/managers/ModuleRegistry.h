@@ -1,101 +1,74 @@
 ﻿#pragma once
-
 #include "modules/BaseModule.h"
 #include "interfaces/iModule.h"
 
 #include <unordered_map>
 #include <memory>
 #include <vector>
-#include <iostream>
 #include <mutex>
 #include <stdexcept>
+#include <iostream>
 
-/*
-# ModuleManager
-    Управляет жизненным циклом модулей, сохраняет их атрибуты и позволяет иметь модульную структуру.
-
-*/
 class ModuleRegistry {
 private:
-    std::unordered_map<int, std::unique_ptr<iModule>> modules_;
-    int nextId_ = 1;
-    std::mutex mutex_;
+    std::unordered_map<int, std::unique_ptr<iModule>> m_mapModules;
+    int m_iNextId = 1;
+    std::mutex m_mtx;
 
-    int generateId() {
-        std::lock_guard<std::mutex> lock(mutex_);
-        return nextId_++;
+    int fnGenerateId()
+    {
+        std::lock_guard<std::mutex> lg(m_mtx);
+        return m_iNextId++;
     }
 
-    void setModuleId(BaseModule* module, int id) {
-        if (module) {
-            module->setId(id);
-        }
+    void fnSetModuleId(BaseModule* pModule, int iId)
+    {
+        if (pModule) pModule->setId(iId);
     }
 
 public:
     template<typename T, typename... Args>
-    T* registerModule(Args&&... args) {
-        auto module = std::make_unique<T>(std::forward<Args>(args)...);
-        int id = generateId();
+    T* registerModule(Args&&... args)
+    {
+        auto upModule = std::make_unique<T>(std::forward<Args>(args)...);
+        int iId = fnGenerateId();
 
-        // Устанавливаем id в модуль
-        setModuleId(module.get(), id);
-
-        // Проверяем, не существует ли уже модуль с таким id
-        if (modules_.find(id) != modules_.end()) {
-            throw std::runtime_error("Internal error: generated duplicate id " + std::to_string(id));
+        if (auto* pBase = dynamic_cast<BaseModule*>(upModule.get())) {
+            fnSetModuleId(pBase, iId);
         }
 
-        T* ptr = module.get();
-        modules_[id] = std::move(module);
-        return ptr;
+        if (m_mapModules.find(iId) != m_mapModules.end()) {
+            throw std::runtime_error("Duplicate module id " + std::to_string(iId));
+        }
+
+        T* pPtr = upModule.get();
+        m_mapModules[iId] = std::move(upModule);
+        return pPtr;
     }
 
-    iModule* getModule(const int& id) {
-        auto it = modules_.find(id);
-        return it != modules_.end() ? it->second.get() : nullptr;
-    }
+    bool initializeAll()
+    {
+        std::lock_guard<std::mutex> lg(m_mtx);
+        bool bAllOk = true;
 
-    template<typename T>
-    T* getModuleAs(const int& id) {
-        return dynamic_cast<T*>(getModule(id));
-    }
-
-    bool initializeAll() {
-        std::lock_guard<std::mutex> lock(mutex_);
-        bool all_ok = true;
-        for (auto& [id, module] : modules_) {
-            if (module->isEnabled()) {
-                if (!module->initialize()) {
-                    std::cerr << "Failed to initialize module: " << id << std::endl;
-                    all_ok = false;
+        for (auto& [iId, upMod] : m_mapModules) {
+            if (upMod->isEnabled()) {
+                if (!upMod->initialize()) {
+                    std::cerr << "Failed to initialize module: " << iId << "\n";
+                    bAllOk = false;
                 }
             }
         }
-        return all_ok;
+        return bAllOk;
     }
 
-    void shutdownAll() {
-        for (auto& [id, module] : modules_) {
-            if (module->isEnabled()) {
-                module->shutdown();
+    void shutdownAll()
+    {
+        std::lock_guard<std::mutex> lg(m_mtx);
+        for (auto& [iId, upMod] : m_mapModules) {
+            if (upMod->isEnabled()) {
+                upMod->shutdown();
             }
         }
-    }
-
-    std::vector<int> getModuleIds() const {
-        std::vector<int> ids;
-        for (const auto& [id, module] : modules_) {
-            ids.push_back(id);
-        }
-        return ids;
-    }
-
-    size_t size() const {
-        return modules_.size();
-    }
-
-    bool empty() const {
-        return modules_.empty();
     }
 };

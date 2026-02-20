@@ -1,12 +1,7 @@
 ﻿#pragma once
 #include "interfaces/iAction.h"
-class BaseAction :
-    public iAction
-{
+
+class BaseAction : public iAction {
+public:
     virtual ~BaseAction() = default;
-
-
-
-
 };
-

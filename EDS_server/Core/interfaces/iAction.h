@@ -1,15 +1,15 @@
 ﻿#pragma once
-
-#include "interfaces/iModule.h"
-#include <functional>
-
 #include <nlohmann/json.hpp>
-//Интерфейс действия
-/*Пример: В верхнеуровневом менеджере регистрируются объекты реализации iAction, после чего он может дёргать их execute с параметрами
-    
-*/
-class iAction : public iModule {
-    virtual ~iAction() = default;
+#include <string>
 
-    virtual bool execute() = 0;
+struct sExecutionContext {
+    void* pSession{};
+    std::string sPeerKey; // trusted peer
+};
+
+class iAction {
+public:
+    virtual ~iAction() = default;
+    virtual std::string fnType() const = 0; // для дебага/инфо
+    virtual bool fnExecute(const nlohmann::json& jMsg, const sExecutionContext& ctx) = 0;
 };

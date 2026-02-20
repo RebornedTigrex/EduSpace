@@ -10,13 +10,14 @@
 namespace Sys {
     namespace Network {
 
-        class cNetHttpServer : public BaseModule{
+
+        class cNetHttpServer final : public BaseModule {
         public:
             using tHealthFn = std::function<std::string()>;
             using tMetricsFn = std::function<std::string()>;
 
             cNetHttpServer(boost::asio::io_context& ioCtx, unsigned short port);
-            ~cNetHttpServer();
+            ~cNetHttpServer() override;
 
             void fnSetHealthFn(tHealthFn fn) { m_fnHealth = std::move(fn); }
             void fnSetMetricsFn(tMetricsFn fn) { m_fnMetrics = std::move(fn); }
@@ -35,6 +36,10 @@ namespace Sys {
 
             tHealthFn m_fnHealth;
             tMetricsFn m_fnMetrics;
+        protected:
+            bool onInitialize() override { return fnStart(); }
+            void onShutdown() override { fnStop(); }
+
         };
 
     } // namespace Network
