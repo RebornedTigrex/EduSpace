@@ -4,7 +4,7 @@ using namespace Sys::Modules;
 
 bool cRtcRelayModule::onInitialize()
 {
-    m_cConnBin = m_rBus.subscribe<Sys::Events::sRtcBinaryIn>(
+    m_cConnBin = m_rBus->subscribe<Sys::Events::sRtcBinaryIn>(
         [this](const Sys::Events::sRtcBinaryIn& e) { fnOnRtcBinary(e); }
     );
     return true;

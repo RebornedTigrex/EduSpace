@@ -23,7 +23,7 @@ namespace Sys {
         }
 
 
-        bool cNetHttpServer::fnStart()
+        bool cNetHttpServer::fnStart()//FIXME: Стена ификов. Спроси нейронку как сделать нормальный обработчик ошибок с std инструментами
         {
             if (m_bRunning) return true;
 

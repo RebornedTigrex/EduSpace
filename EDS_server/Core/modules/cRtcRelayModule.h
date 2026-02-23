@@ -11,12 +11,12 @@ namespace Sys::Modules {
 
     class cRtcRelayModule final : public BaseModule {
     public:
-        cRtcRelayModule(EventBus& rBus,
+        cRtcRelayModule(
             Sys::Services::cConferenceService& rConf,
             Sys::Services::cPeerDirectoryService& rDir,
             cRtcModule& rRtc)
             : BaseModule("RtcRelayModule"),
-            m_rBus(rBus),
+            
             m_rConf(rConf),
             m_rDir(rDir),
             m_rRtc(rRtc)
@@ -31,7 +31,7 @@ namespace Sys::Modules {
         void fnOnRtcBinary(const Sys::Events::sRtcBinaryIn& e);
 
     private:
-        EventBus& m_rBus;
+        std::shared_ptr<EventBus> m_rBus = EventBus::instance();
         Sys::Services::cConferenceService& m_rConf;
         Sys::Services::cPeerDirectoryService& m_rDir;
         cRtcModule& m_rRtc;

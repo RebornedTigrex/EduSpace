@@ -20,9 +20,9 @@ namespace Sys::Modules {
 
     class cRtcModule final : public BaseModule {
     public:
-        cRtcModule(EventBus& rBus, Sys::Services::cPeerDirectoryService& rDir)
+        cRtcModule( Sys::Services::cPeerDirectoryService& rDir)
             : BaseModule("RtcModule"),
-            m_rBus(rBus),
+            
             m_rDir(rDir)
         {
         }
@@ -51,7 +51,7 @@ namespace Sys::Modules {
         void fnPublishRtcBinaryIn(const std::string& sPeerKey, const std::vector<uint8_t>& vData);
 
     private:
-        EventBus& m_rBus;
+        std::shared_ptr<EventBus> m_rBus = EventBus::instance();
         Sys::Services::cPeerDirectoryService& m_rDir;
 
         std::shared_ptr<Sys::Rtc::cRtcManager> m_spRtc;

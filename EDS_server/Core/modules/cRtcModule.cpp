@@ -10,7 +10,7 @@ bool cRtcModule::onInitialize()
     m_spRtc = std::make_shared<Sys::Rtc::cRtcManager>(
         [this](void* pSession, const std::string& sMsg)
         {
-            m_rBus.publish(Sys::Events::sWsSendText{ pSession, sMsg });
+            m_rBus->publish(Sys::Events::sWsSendText{ pSession, sMsg });
         }
     );
     if (!m_spRtc->fnInit()) {
@@ -25,14 +25,14 @@ bool cRtcModule::onInitialize()
             fnPublishRtcBinaryIn(sPeerKey, vData);
         }
     );
-    m_cConnConn = m_rBus.subscribe<Sys::Events::sWsConnected>(
+    m_cConnConn = m_rBus->subscribe<Sys::Events::sWsConnected>(
         [this](const Sys::Events::sWsConnected& oEv)
         {
             fnOnWsConnected(oEv);
         }
     );
 
-    m_cConnDisc = m_rBus.subscribe<Sys::Events::sWsDisconnected>(
+    m_cConnDisc = m_rBus->subscribe<Sys::Events::sWsDisconnected>(
         [this](const Sys::Events::sWsDisconnected& oEv)
         {
             fnOnWsDisconnected(oEv);
@@ -125,15 +125,15 @@ void cRtcModule::fnSendPeerAssigned(void* pSession, const std::string& sPeerKey)
     jAssign["type"] = "peer_assigned";
     jAssign["peer"] = sPeerKey;
 
-    m_rBus.publish(Sys::Events::sWsSendText{ pSession, jAssign.dump() });
+    m_rBus->publish(Sys::Events::sWsSendText{ pSession, jAssign.dump() });
 }
 
 void cRtcModule::fnPublishPeerAssigned(void* pSession, const std::string& sPeerKey)
 {
-    m_rBus.publish(Sys::Events::sPeerAssigned{ pSession, sPeerKey });
+    m_rBus->publish(Sys::Events::sPeerAssigned{ pSession, sPeerKey });
 }
 
 void cRtcModule::fnPublishRtcBinaryIn(const std::string& sPeerKey, const std::vector<uint8_t>& vData)
 {
-    m_rBus.publish(Sys::Events::sRtcBinaryIn{ sPeerKey, vData });
+    m_rBus->publish(Sys::Events::sRtcBinaryIn{ sPeerKey, vData });
 }

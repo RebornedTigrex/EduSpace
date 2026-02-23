@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 #include "interfaces/iAction.h"
 #include "EventBus.h"
 #include "events/NetEvents.h"
@@ -7,10 +7,10 @@
 
 class cConferenceAction final : public iAction {
 public:
-    cConferenceAction(EventBus& rBus,
+    cConferenceAction(
         Sys::Services::cConferenceService& rConf,
         Sys::Services::cPeerDirectoryService& rDir)
-        : m_rBus(rBus), m_rConf(rConf), m_rDir(rDir)
+        : m_rConf(rConf), m_rDir(rDir)
     {
     }
 
@@ -42,7 +42,7 @@ private:
             {"invite", sInvite},
             {"peer", ctx.sPeerKey}
         };
-        m_rBus.publish(Sys::Events::sWsSendText{ ctx.pSession, jResp.dump() });
+        m_rBus->publish(Sys::Events::sWsSendText{ ctx.pSession, jResp.dump() });
         return true;
     }
 
@@ -58,7 +58,7 @@ private:
                 {"reason","bad_invite"},
                 {"peer", ctx.sPeerKey}
             };
-            m_rBus.publish(Sys::Events::sWsSendText{ ctx.pSession, jResp.dump() });
+            m_rBus->publish(Sys::Events::sWsSendText{ ctx.pSession, jResp.dump() });
             return true;
         }
 
@@ -71,7 +71,7 @@ private:
             {"peer", ctx.sPeerKey},
             {"peers", setPeers}
         };
-        m_rBus.publish(Sys::Events::sWsSendText{ ctx.pSession, jAck.dump() });
+        m_rBus->publish(Sys::Events::sWsSendText{ ctx.pSession, jAck.dump() });
 
         nlohmann::json jEv{
             {"type","conf_peer_joined"},
@@ -82,7 +82,7 @@ private:
         for (const auto& sPeer : setPeers) {
             if (sPeer == ctx.sPeerKey) continue;
             void* pSess = m_rDir.fnGetSessionByPeer(sPeer);
-            if (pSess) m_rBus.publish(Sys::Events::sWsSendText{ pSess, jEv.dump() });
+            if (pSess) m_rBus->publish(Sys::Events::sWsSendText{ pSess, jEv.dump() });
         }
         return true;
     }
@@ -96,11 +96,11 @@ private:
         for (const auto& sPeer : setPeersBefore) {
             if (sPeer == ctx.sPeerKey) continue;
             void* pSess = m_rDir.fnGetSessionByPeer(sPeer);
-            if (pSess) m_rBus.publish(Sys::Events::sWsSendText{ pSess, jEv.dump() });
+            if (pSess) m_rBus->publish(Sys::Events::sWsSendText{ pSess, jEv.dump() });
         }
 
         nlohmann::json jAck{ {"type","conf_left"}, {"peer", ctx.sPeerKey} };
-        m_rBus.publish(Sys::Events::sWsSendText{ ctx.pSession, jAck.dump() });
+        m_rBus->publish(Sys::Events::sWsSendText{ ctx.pSession, jAck.dump() });
         return true;
     }
 
@@ -113,16 +113,16 @@ private:
         for (const auto& sPeer : setPeers) {
             if (sPeer == ctx.sPeerKey) continue;
             void* pSess = m_rDir.fnGetSessionByPeer(sPeer);
-            if (pSess) m_rBus.publish(Sys::Events::sWsSendText{ pSess, jEv.dump() });
+            if (pSess) m_rBus->publish(Sys::Events::sWsSendText{ pSess, jEv.dump() });
         }
 
         nlohmann::json jAck{ {"type","conf_mic_ack"}, {"peer", ctx.sPeerKey}, {"enabled", bEnabled} };
-        m_rBus.publish(Sys::Events::sWsSendText{ ctx.pSession, jAck.dump() });
+        m_rBus->publish(Sys::Events::sWsSendText{ ctx.pSession, jAck.dump() });
         return true;
     }
 
 private:
-    EventBus& m_rBus;
+    std::shared_ptr<EventBus> m_rBus = EventBus::instance();
     Sys::Services::cConferenceService& m_rConf;
     Sys::Services::cPeerDirectoryService& m_rDir;
 };

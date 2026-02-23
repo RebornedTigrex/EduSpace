@@ -13,9 +13,9 @@ namespace Sys::Modules {
 
     class cNetModule final : public BaseModule {
     public:
-        cNetModule(EventBus& rBus, unsigned short uWsPort, unsigned short uHttpPort)
+        cNetModule( unsigned short uWsPort, unsigned short uHttpPort)
             : BaseModule("NetModule"),
-            m_rBus(rBus),
+            
             m_uWsPort(uWsPort),
             m_uHttpPort(uHttpPort)
         {
@@ -32,7 +32,7 @@ namespace Sys::Modules {
         void fnOnSendWsText(const Sys::Events::sWsSendText& e);
 
     private:
-        EventBus& m_rBus;
+        std::shared_ptr<EventBus> m_rBus = EventBus::instance();
         unsigned short m_uWsPort{};
         unsigned short m_uHttpPort{};
 

@@ -17,7 +17,7 @@ namespace Sys {
         void fnShutdown();
 
     private:
-        EventBus m_oBus;
+        std::shared_ptr<EventBus> m_oBus = EventBus::instance();
         ModuleRegistry m_oRegistry;
 
         Sys::Services::cPeerDirectoryService m_oDir;

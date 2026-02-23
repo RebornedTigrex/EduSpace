@@ -21,35 +21,35 @@ namespace Sys {
     bool cAppCore::fnInit(unsigned short uWsPort, unsigned short uHttpPort)
     {
         // 1) Net
-        (void)m_oRegistry.registerModule<Sys::Modules::cNetModule>(m_oBus, uWsPort, uHttpPort);
+        (void)m_oRegistry.registerModule<Sys::Modules::cNetModule>( uWsPort, uHttpPort);
 
         // 2) Domain
         (void)m_oRegistry.registerModule<Sys::Modules::cConferenceModule>(m_oConf);
 
         // 3) RTC
-        auto* pRtc = m_oRegistry.registerModule<Sys::Modules::cRtcModule>(m_oBus, m_oDir);
+        auto* pRtc = m_oRegistry.registerModule<Sys::Modules::cRtcModule>( m_oDir);
 
         // 4) RTC relay
-        (void)m_oRegistry.registerModule<Sys::Modules::cRtcRelayModule>(m_oBus, m_oConf, m_oDir, *pRtc);
+        (void)m_oRegistry.registerModule<Sys::Modules::cRtcRelayModule>( m_oConf, m_oDir, *pRtc);
 
         // 5) Actions infra
         auto* pActionMgrMod = m_oRegistry.registerModule<Sys::Modules::cActionManagerModule>();
-        (void)m_oRegistry.registerModule<Sys::Modules::cActionRouterModule>(m_oBus, m_oDir, *pActionMgrMod);
+        (void)m_oRegistry.registerModule<Sys::Modules::cActionRouterModule>( m_oDir, *pActionMgrMod);
         {
             auto& rMgr = pActionMgrMod->fnMgr();
 
             // conf_* -> один action
             rMgr.registerAction("conf_create", [&]() {
-                return std::make_unique<cConferenceAction>(m_oBus, m_oConf, m_oDir);
+                return std::make_unique<cConferenceAction>( m_oConf, m_oDir);
                 });
             rMgr.registerAction("conf_join", [&]() {
-                return std::make_unique<cConferenceAction>(m_oBus, m_oConf, m_oDir);
+                return std::make_unique<cConferenceAction>( m_oConf, m_oDir);
                 });
             rMgr.registerAction("conf_leave", [&]() {
-                return std::make_unique<cConferenceAction>(m_oBus, m_oConf, m_oDir);
+                return std::make_unique<cConferenceAction>( m_oConf, m_oDir);
                 });
             rMgr.registerAction("conf_mic", [&]() {
-                return std::make_unique<cConferenceAction>(m_oBus, m_oConf, m_oDir);
+                return std::make_unique<cConferenceAction>( m_oConf, m_oDir);
                 });
 
             // webrtc_* -> один action

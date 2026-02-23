@@ -17,7 +17,7 @@ bool cNetModule::onInitialize()
     m_upHttp->fnSetHealthFn([]() { return R"({"status":"ok"})"; });
     m_upHttp->fnSetMetricsFn([]() { return R"({"metrics":{"ok":1}})"; });
 
-    m_cConnSend = m_rBus.subscribe<Sys::Events::sWsSendText>(
+    m_cConnSend = m_rBus->subscribe<Sys::Events::sWsSendText>(
         [this](const Sys::Events::sWsSendText& e) { fnOnSendWsText(e); }
     );
     if (!m_oIo.fnStart()) return false;
@@ -42,17 +42,17 @@ void cNetModule::onShutdown()
 
 void cNetModule::fnOnWsConnected(void* pSession)
 {
-    m_rBus.publish(Sys::Events::sWsConnected{ pSession });
+    m_rBus->publish(Sys::Events::sWsConnected{ pSession });
 }
 
 void cNetModule::fnOnWsDisconnected(void* pSession)
 {
-    m_rBus.publish(Sys::Events::sWsDisconnected{ pSession });
+    m_rBus->publish(Sys::Events::sWsDisconnected{ pSession });
 }
 
 void cNetModule::fnOnWsMessage(const std::string& sMsg, void* pSession)
 {
-    m_rBus.publish(Sys::Events::sWsMessageText{ pSession, sMsg });
+    m_rBus->publish(Sys::Events::sWsMessageText{ pSession, sMsg });
 }
 
 void cNetModule::fnOnSendWsText(const Sys::Events::sWsSendText& e)

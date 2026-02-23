@@ -5,7 +5,7 @@ using namespace Sys::Modules;
 
 bool cActionRouterModule::onInitialize()
 {
-    m_cConnWs = m_rBus.subscribe<Sys::Events::sWsMessageText>(
+    m_cConnWs = m_rBus->subscribe<Sys::Events::sWsMessageText>(
         [this](const Sys::Events::sWsMessageText& e) { fnOnWsText(e); }
     );
     return true;

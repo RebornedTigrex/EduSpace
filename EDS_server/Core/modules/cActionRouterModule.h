@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 #include "modules/BaseModule.h"
 #include "EventBus.h"
 #include "events/NetEvents.h"
@@ -11,11 +11,10 @@ namespace Sys::Modules {
 
     class cActionRouterModule final : public BaseModule {
     public:
-        cActionRouterModule(EventBus& rBus,
+        cActionRouterModule(
             Sys::Services::cPeerDirectoryService& rDir,
             cActionManagerModule& rMgr)
             : BaseModule("ActionRouter"),
-            m_rBus(rBus),
             m_rDir(rDir),
             m_rMgr(rMgr)
         {
@@ -29,7 +28,7 @@ namespace Sys::Modules {
         void fnOnWsText(const Sys::Events::sWsMessageText& e);
 
     private:
-        EventBus& m_rBus;
+        std::shared_ptr<EventBus> m_rBus = EventBus::instance();
         Sys::Services::cPeerDirectoryService& m_rDir;
         cActionManagerModule& m_rMgr;
 
