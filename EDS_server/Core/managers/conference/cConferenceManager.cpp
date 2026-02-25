@@ -3,7 +3,7 @@
 
 using namespace Sys::Conference;
 
-std::string cConferenceManager::fnGenInvite()
+[[deprecated("Используйте utils/utils.h, там есть генератор строк")]] std::string cConferenceManager::fnGenInvite()
 {
     static const char* alphabet = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
     std::random_device rd;
