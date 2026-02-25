@@ -101,7 +101,7 @@ bool cRtcModule::fnOnSignaling(void* pSession,
     return true;
 }
 
-std::string cRtcModule::fnGeneratePeerKey() const
+[[deprecated("Используйте utils/wordGenerator.h")]]std::string cRtcModule::fnGeneratePeerKey() const //Заменить на 
 {
     static const char* sHex = "0123456789abcdef";
 

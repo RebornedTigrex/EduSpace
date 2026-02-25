@@ -71,12 +71,6 @@
     <ClCompile Include="utils\cLogger.cpp">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
-    <ClCompile Include="rtc\cRtcManager.cpp">
-      <Filter>Исходные файлы</Filter>
-    </ClCompile>
-    <ClCompile Include="rtc\cRtcPeer.cpp">
-      <Filter>Исходные файлы</Filter>
-    </ClCompile>
     <ClCompile Include="network\cNetHttpServer.cpp">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
@@ -106,6 +100,12 @@
     </ClCompile>
     <ClCompile Include="Core\modules\cActionRouterModule.cpp">
       <Filter>Исходные файлы</Filter>
+    </ClCompile>
+    <ClCompile Include="rtc\cRtcManager.cpp">
+      <Filter>EDS_server\rtc</Filter>
+    </ClCompile>
+    <ClCompile Include="rtc\cRtcPeer.cpp">
+      <Filter>EDS_server\rtc</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -140,12 +140,6 @@
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
     <ClInclude Include="utils\utils.h">
-      <Filter>Файлы заголовков</Filter>
-    </ClInclude>
-    <ClInclude Include="rtc\cRtcPeer.h">
-      <Filter>Файлы заголовков</Filter>
-    </ClInclude>
-    <ClInclude Include="rtc\cRtcManager.h">
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
     <ClInclude Include="network\cNetHttpServer.h">
@@ -199,8 +193,17 @@
     <ClInclude Include="Core\managers\conference\cConferenceAction.h">
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
+    <ClInclude Include="App\modules\wsFormat.h">
+      <Filter>EDS_server\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="rtc\cRtcPeer.h">
+      <Filter>EDS_server\rtc</Filter>
+    </ClInclude>
+    <ClInclude Include="rtc\cRtcManager.h">
+      <Filter>EDS_server\rtc</Filter>
+    </ClInclude>
     <ClInclude Include="rtc\cWebRtcAction.h">
-      <Filter>Файлы заголовков</Filter>
+      <Filter>EDS_server\rtc</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
