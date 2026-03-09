@@ -1,53 +1,16 @@
-<#
-.SYNOPSIS
-Build helper for EduSpace (MSVC + vcpkg + CMake presets).
-
-.DESCRIPTION
-The script auto-detects Visual Studio C++ tools (via vswhere + VsDevCmd),
-resolves VCPKG_ROOT (env or common fallback paths), then runs CMake configure/build.
-
-.PARAMETER Preset
-CMake configure preset name (default: x64-debug or $env:EDUSPACE_PRESET).
-
-.PARAMETER BuildDir
-Custom binary directory (default: out/build/<preset>-mediasoup or $env:EDUSPACE_BUILD_DIR).
-
-.PARAMETER Target
-Build target name (default: eds_server_new_mediasoup_app or $env:EDUSPACE_TARGET).
-
-.PARAMETER ConfigureOnly
-Run only CMake configure step.
-
-.PARAMETER BuildOnly
-Run only CMake build step.
-
-.PARAMETER Run
-Run built executable after successful build.
-
-.EXAMPLE
-pwsh -File .\build.ps1
-
-.EXAMPLE
-pwsh -File .\build.ps1 -Preset x64-release -Target eds_server_new_mediasoup_app
-
-.EXAMPLE
-$env:EDUSPACE_PRESET = "x64-debug"
-$env:EDUSPACE_JOBS = "12"
-pwsh -File .\build.ps1 -Run
-#>
 [CmdletBinding()]
 param(
-    [string]$Preset = "",
-    [string]$SourceDir = "",
+    [string]$Preset = "x64-debug",
+    [string]$SourceDir = $PSScriptRoot,
     [string]$BuildDir = "",
-    [string]$Target = "",
+    [string]$Target = "eds_server_new_mediasoup_app",
     [ValidateSet("ON", "OFF")]
-    [string]$BuildServer = "",
+    [string]$BuildServer = "OFF",
     [ValidateSet("ON", "OFF")]
-    [string]$BuildCli = "",
+    [string]$BuildCli = "OFF",
     [ValidateSet("ON", "OFF")]
-    [string]$BuildServerNew = "",
-    [int]$Jobs = 0,
+    [string]$BuildServerNew = "ON",
+    [int]$Jobs = 8,
     [switch]$ConfigureOnly,
     [switch]$BuildOnly,
     [switch]$Run,
@@ -55,34 +18,8 @@ param(
 )
 
 $ErrorActionPreference = "Stop"
-
-if ([string]::IsNullOrWhiteSpace($Preset)) {
-    $Preset = if ($env:EDUSPACE_PRESET) { $env:EDUSPACE_PRESET } else { "x64-debug" }
-}
-if ([string]::IsNullOrWhiteSpace($SourceDir)) {
-    $SourceDir = if ($env:EDUSPACE_SOURCE_DIR) { $env:EDUSPACE_SOURCE_DIR } else { $PSScriptRoot }
-}
 if ([string]::IsNullOrWhiteSpace($BuildDir)) {
-    if ($env:EDUSPACE_BUILD_DIR) {
-        $BuildDir = $env:EDUSPACE_BUILD_DIR
-    } else {
-        $BuildDir = Join-Path $PSScriptRoot ("out/build/{0}-mediasoup" -f $Preset)
-    }
-}
-if ([string]::IsNullOrWhiteSpace($Target)) {
-    $Target = if ($env:EDUSPACE_TARGET) { $env:EDUSPACE_TARGET } else { "eds_server_new_mediasoup_app" }
-}
-if ([string]::IsNullOrWhiteSpace($BuildServer)) {
-    $BuildServer = if ($env:EDUSPACE_BUILD_SERVER) { $env:EDUSPACE_BUILD_SERVER } else { "OFF" }
-}
-if ([string]::IsNullOrWhiteSpace($BuildCli)) {
-    $BuildCli = if ($env:EDUSPACE_BUILD_CLI) { $env:EDUSPACE_BUILD_CLI } else { "OFF" }
-}
-if ([string]::IsNullOrWhiteSpace($BuildServerNew)) {
-    $BuildServerNew = if ($env:EDUSPACE_BUILD_SERVER_NEW) { $env:EDUSPACE_BUILD_SERVER_NEW } else { "ON" }
-}
-if ($Jobs -le 0) {
-    $Jobs = if ($env:EDUSPACE_JOBS) { [int]$env:EDUSPACE_JOBS } else { 8 }
+    $BuildDir = Join-Path $PSScriptRoot ("out/build/{0}-mediasoup" -f $Preset)
 }
 
 function Resolve-VsWherePath {
@@ -100,14 +37,18 @@ function Resolve-VsWherePath {
 }
 
 function Resolve-VcpkgRoot {
+
     if ($env:VCPKG_ROOT -and (Test-Path $env:VCPKG_ROOT)) {
-        return (Resolve-Path $env:VCPKG_ROOT).Path
+        $resolved = (Resolve-Path $env:VCPKG_ROOT).Path
+        $env:VCPKG_ROOT = $resolved
+        return $resolved
     }
 
     $candidates = @(
+        "D:\vcpkg",
+        "C:\vcpkg",
         (Join-Path $PSScriptRoot "vcpkg"),
-        (Join-Path $env:USERPROFILE "vcpkg"),
-        "C:\vcpkg"
+        (Join-Path $env:USERPROFILE "vcpkg")
     )
 
     foreach ($candidate in $candidates) {
@@ -164,24 +105,47 @@ if ($Clean -and (Test-Path $BuildDir)) {
     Remove-Item -Path $BuildDir -Recurse -Force
 }
 
-$vswherePath = Resolve-VsWherePath
-$vsInstallPath = (& $vswherePath -latest -products * -requires Microsoft.VisualStudio.Component.VC.Tools.x86.x64 -property installationPath).Trim()
-if ([string]::IsNullOrWhiteSpace($vsInstallPath)) {
-    throw "No Visual Studio installation with C++ tools was found."
-}
-
-$vsDevCmd = Join-Path $vsInstallPath "Common7\Tools\VsDevCmd.bat"
-if (-not (Test-Path $vsDevCmd)) {
-    throw "VsDevCmd.bat not found at expected path: $vsDevCmd"
-}
 
 $resolvedVcpkgRoot = Resolve-VcpkgRoot
-Write-Host "Using Visual Studio: $vsInstallPath"
 Write-Host "Using VCPKG_ROOT: $resolvedVcpkgRoot"
-
-Import-MsvcEnvironment -VsDevCmdPath $vsDevCmd
+$msvcAlreadyReady = $null -ne (Get-Command cl.exe -ErrorAction SilentlyContinue)
+if ($msvcAlreadyReady) {
+    Write-Host "MSVC environment already initialized, skipping VsDevCmd."
+} else {
+    $vswherePath = Resolve-VsWherePath
+    $vsInstallPath = (& $vswherePath -latest -products * -requires Microsoft.VisualStudio.Component.VC.Tools.x86.x64 -property installationPath).Trim()
+    if ([string]::IsNullOrWhiteSpace($vsInstallPath)) {
+        throw "No Visual Studio installation with C++ tools was found."
+    }
+    Write-Host "Using Visual Studio: $vsInstallPath"
+    $vsDevCmd = Join-Path $vsInstallPath "Common7\Tools\VsDevCmd.bat"
+    if (-not (Test-Path $vsDevCmd)) {
+        throw "VsDevCmd.bat not found at expected path: $vsDevCmd"
+    }
+    Import-MsvcEnvironment -VsDevCmdPath $vsDevCmd
+}
 $env:VCPKG_ROOT = $resolvedVcpkgRoot
 Write-Host "Re-applied VCPKG_ROOT after VsDevCmd: $env:VCPKG_ROOT"
+
+$vcpkgTriplet = ""
+$isWindowsHost = $false
+if (Get-Variable -Name IsWindows -Scope Global -ErrorAction SilentlyContinue) {
+    $isWindowsHost = [bool]$IsWindows
+} elseif ($env:OS -eq "Windows_NT") {
+    $isWindowsHost = $true
+}
+if ($env:VCPKG_TARGET_TRIPLET) {
+    $vcpkgTriplet = $env:VCPKG_TARGET_TRIPLET
+} elseif ($isWindowsHost) {
+    if ($Preset -match "x86") {
+        $vcpkgTriplet = "x86-windows"
+    } else {
+        $vcpkgTriplet = "x64-windows"
+    }
+}
+if (-not [string]::IsNullOrWhiteSpace($vcpkgTriplet)) {
+    Write-Host "Using VCPKG_TARGET_TRIPLET: $vcpkgTriplet"
+}
 
 if (-not $BuildOnly) {
     $configureArgs = @(
@@ -192,6 +156,9 @@ if (-not $BuildOnly) {
         "-DEDUSPACE_BUILD_CLI=$BuildCli",
         "-DEDUSPACE_BUILD_SERVER_NEW=$BuildServerNew"
     )
+    if ($vcpkgTriplet) {
+        $configureArgs += "-DVCPKG_TARGET_TRIPLET=$vcpkgTriplet"
+    }
     Invoke-External -Exe "cmake" -Args $configureArgs
 }
 
