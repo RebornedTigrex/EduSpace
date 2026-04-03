@@ -150,6 +150,7 @@ void MediasoupSignalingGateway::onMessage(const std::string& text, void* session
     try {
         const auto trustedPeer = resolveTrustedPeer(session);
         const auto request = json::parse(text);
+        const auto messageType = request.value("type", std::string{});
         const auto objectType = request.value("object", std::string{});
         const auto agentType = request.value("agent", std::string{});
         const auto actionType = request.value("action", std::string{});
@@ -163,6 +164,15 @@ void MediasoupSignalingGateway::onMessage(const std::string& text, void* session
                       << " action=" << actionType
                       << " payload_bytes=" << text.size()
                       << "\n";
+        }
+        if (messageType == "audio_data") {
+            response = {
+                { "type", "dispatch_result" },
+                { "ok", false },
+                { "message", "audio_data over signaling websocket is forbidden. Use mediasoup WebRTC transport for media flow." }
+            };
+            wsServer_->sendText(session, response.dump());
+            return;
         }
 
         if (actionType.empty()) {
@@ -211,6 +221,7 @@ void MediasoupSignalingGateway::onMessage(const std::string& text, void* session
         const auto effectiveAgent = dispatchResult.effectiveAgent.empty()
             ? agentType
             : dispatchResult.effectiveAgent;
+
         if (debugMode_) {
             std::cout << "[mediasoup][debug][signaling] dispatch_result"
                       << " peer=" << trustedPeer
@@ -222,6 +233,7 @@ void MediasoupSignalingGateway::onMessage(const std::string& text, void* session
                       << " message=\"" << status.message << "\""
                       << "\n";
         }
+
         response = {
             { "type", "dispatch_result" },
             { "object", objectType },
@@ -234,7 +246,6 @@ void MediasoupSignalingGateway::onMessage(const std::string& text, void* session
         if (directMediasoupRequested) {
             response["note"] = "Direct mediasoup mode is enabled for isolated tests only.";
         }
-
         for (const auto& event : dispatchResult.outboundEvents) {
             auto outboundEvent = event;
             const auto eventType = outboundEvent.value("type", std::string("unknown"));
